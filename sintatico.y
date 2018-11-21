@@ -34,42 +34,34 @@
 
 %%
 
-start: program END_FILE {printf("\n\nSUCCESSFUL COMPILATION.\n"); exit(0);}
+// start: program END_FILE {printf("\n\nSUCCESSFUL COMPILATION.\n"); exit(0);}
+// ;
+
+start: END_FILE
+	| program start
 ;
 
-program: GRAPH NUMBER COLON color {printf("\nGRAPH %d", ++num);}
+program: graph color bloco
 ;
 
-program1:
-  | program
+graph: GRAPH NUMBER COLON EOL {}
 ;
 
-color: K ASSIGN NUMBER vertexes
-	| K ASSIGN NUMBER useless1
+color: K ASSIGN NUMBER EOL
 ;
 
-
-
-vertexes: NUMBER INFER edges
+bloco:
+	| NUMBER INFER NUMBER edges
+	| NUMBER MOVE NUMBER move
 ;
 
-edges: NUMBER edges1
+edges: NUMBER edges
+	| EOL bloco
 ;
 
-edges1: NUMBER edges1
-  | edges2
-;
-
-edges2: vertexes
-  | useless
-  | program1
-;
-
-useless: NUMBER MOVE NUMBER useless1
-;
-
-useless1: useless
-  | program1
+move: 
+	| EOL
+	| NUMBER MOVE NUMBER move
 ;
 
 %%
