@@ -34,10 +34,7 @@
 
 %%
 
-// start: program END_FILE {printf("\n\nSUCCESSFUL COMPILATION.\n"); exit(0);}
-// ;
-
-start: END_FILE
+start: END_FILE {printf("VAI PORRA!\n"); exit(0);}
 	| program start
 ;
 
