@@ -10,7 +10,7 @@ SINTATICO = sintatico.y
 
 $(PROGRAMA): $(LEXICO) $(SINTATICO)
 	$(FLEX) $(LEXICO)
-	$(BISON) -d $(SINTATICO)
+	$(BISON) -d $(SINTATICO) -r states
 	$(CC) -c *.c -I.
 	$(CC) *.o -o $(PROGRAMA)
 
@@ -18,5 +18,6 @@ clean:
 	rm -f *.yy.c
 	rm -f *.tab.c
 	rm -f *.tab.h
+	rm -f *.output
 	rm -f *.o
 	rm -f regalloc

@@ -4,7 +4,7 @@
 
 %{
   #include <sintatico.tab.h>
-  int line=0;
+  int line=1;
 %}
 
 %%
@@ -15,8 +15,8 @@
 " "               {}
 "-->"             {return INFER; printf("--> ");}
 "<->"             {return MOVE; printf("<-> ");}
-[\n]              {++line;}
-[0-9]+            {return NUMBER; printf("%s ", yytext);}
+[\n]              {line++; return EOL;}
+[0-9]+            {yylval.integer = atoi(yytext); return NUMBER; printf("%s ", yytext);}
 .                 {return ERROR; printf("ERRO");}
 <<EOF>>           {return END_FILE;}
 %%
@@ -27,7 +27,7 @@
 // " "               {}
 // "-->"             {printf("--> "); return INFER;}
 // "<->"             {printf("<-> "); return MOVE;}
-// [\n]              {printf("\n");}
+// [\n]              {printf("\n"); return EOL;}
 // [0-9]+            {printf("%s ", yytext); return NUMBER;}
 // .                 {printf("ERRO"); return ERROR;}
 // <<EOF>>           {return END_FILE;}
