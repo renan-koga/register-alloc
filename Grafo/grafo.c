@@ -12,22 +12,22 @@ grafo createGraph(){
     return anyGrafo;
 }
 /*Gera uma instância do tipo Point, com um id e sua cor*/
-point* createPoint(int registrador, int cor){
+point* createPoint(int registrador){
     point* anyPoint = NULL;
 
     anyPoint = (point*) malloc(sizeof(point));
     anyPoint->registrador = registrador;
     anyPoint->interferencias = createLista();
     anyPoint->removido = 0;
-    anyPoint->cor = cor;
+    anyPoint->cor = -1;
 
     return anyPoint;
 }
 /*Insere um registrador no grafo*/
-point* insertPoint(grafo anyGrafo, int registrador, int cor){
+point* insertPoint(grafo anyGrafo, int registrador){
     point* anyPoint = NULL;
 
-    anyPoint = createPoint(registrador, cor);
+    anyPoint = createPoint(registrador);
     addNode(anyGrafo, anyPoint);
 
     return anyPoint;
@@ -42,7 +42,7 @@ void createEdge(point* reg1, point* reg2){
     addNode(reg2->interferencias, anyEdge);
 }
 /*Insere uma aresta entre Point 'reg1' e Point 'reg2'*/
-void insertEdge(grafo anyGrafo, int reg1, int cor1, int reg2, int cor2){
+void insertEdge(grafo anyGrafo, int reg1, int reg2){
     point* anyPoint = NULL;
     point* anotherPoint = NULL;
 
@@ -51,14 +51,14 @@ void insertEdge(grafo anyGrafo, int reg1, int cor1, int reg2, int cor2){
     if(findPoint(anyGrafo, reg2)!=NULL)
         anotherPoint = getThing(findPoint(anyGrafo, reg2));
     if(anyPoint==NULL && anotherPoint==NULL){
-        anyPoint = insertPoint(anyGrafo, reg1, cor1);
-        anotherPoint = insertPoint(anyGrafo, reg2, cor2);
+        anyPoint = insertPoint(anyGrafo, reg1);
+        anotherPoint = insertPoint(anyGrafo, reg2);
     }
     else if(anyPoint==NULL){
-        anyPoint = insertPoint(anyGrafo, reg1, cor1);
+        anyPoint = insertPoint(anyGrafo, reg1);
     }
     else if(anotherPoint==NULL){
-        anotherPoint = insertPoint(anyGrafo, reg2, cor2);
+        anotherPoint = insertPoint(anyGrafo, reg2);
     }
     createEdge(anyPoint, anotherPoint);
 }
@@ -229,4 +229,93 @@ void encerraGrafo(grafo anyGrafo){
 /*Libera a memória da lista de interferências*/
 void destroiEdges(int registrador){
 
+}
+/* ---------------------------------------------------- */
+/* Remove um vértice do grafo; */
+void removeVertex(grafo anyGrafo, int registrador){
+
+}
+/* Empilha o grafo na pilha(stack); */
+Lista pileGraph(grafo anyGrafo, Lista stack){
+
+}
+/* Desempilha a pilha reformando o grafo; */
+void unpileStack(grafo anyGrafo, Lista stack){
+
+}
+/* Encontra o vértice com um grau menor do que K */
+point* findLessK(grafo anyGrafo, int k){
+
+}
+/* Encontra algum potencial spill no grafo; */
+point* findPotencialSpill(grafo anyGrafo){
+
+}
+/* Conta o número de vértices ativos no grafo; */
+int countVertexes(grafo anyGrafo){
+    int i, resp;
+    point* anyPoint = NULL;
+    Node anyNode = NULL;
+
+    anyNode = getFirstNode(anyGrafo);
+    for(i=0;i<lenghtLista(anyGrafo);i++){
+        anyPoint = getThing(anyNode);
+        if(anyPoint->removido == 0)
+            resp++;
+        anyNode = getNext(anyPoint);
+    }
+
+    return resp;
+}
+/* Conta o grau do registrador; */
+int countDegree(grafo anyGrafo, int registrador){
+    int i, resp=0;
+    point* anyPoint = NULL;
+    point* otherPoint = NULL;
+    edge* anyEdge = NULL;
+    Node anyNode = NULL;
+
+    anyPoint = getThing(findPoint(anyGrafo, registrador));
+    anyNode = getFirstNode(anyPoint->interferencias);
+    for(i=0;i<lenghtLista(anyPoint->interferencias);i++){
+        anyEdge = getThing(anyNode);
+        if(anyEdge->reg1 == anyPoint)
+            otherPoint = anyEdge->reg2;
+        else
+            otherPoint = anyEdge->reg1;
+        if(otherPoint->removido == 0)
+            resp++;
+        anyNode = getNext(anyNode);
+    }
+
+    return resp;
+}
+/* Atribui uma cor ao registrador; retorna 1 para sucesso e 0 para erro ao atribuir; */
+int assignColor(point* anyPoint, int k){
+    int* neighbourColor = (int*) malloc(k*sizeof(int));
+    int i;
+    point* anotherPoint = NULL;
+    Node anyNode = NULL;
+
+    for(i=0;i<k;i++)
+        neighbourColor[i] = 0;
+    anyNode = getFirstNode(anyPoint->interferencias);
+    for(i=0;i<lenghtLista(anyPoint->interferencias);i++){
+        anotherPoint = getThing(anyNode);
+        neighbourColor[anotherPoint->cor] = 1;
+        anyNode = getNext(anyNode);
+    }
+    if(i == 0){
+        anyPoint->cor = 0;
+        return 1;
+    }
+    else{
+        for(i=0;i<k;i++){
+            if(neighbourColor[i] == 0){
+                anyPoint->cor = i;
+                return 1;
+            }
+        }        
+        return 0;
+    }
 }
