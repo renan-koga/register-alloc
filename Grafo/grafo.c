@@ -233,7 +233,10 @@ void destroiEdges(int registrador){
 /* ---------------------------------------------------- */
 /* Remove um vértice do grafo; */
 void removeVertex(grafo anyGrafo, int registrador){
+    point* anyPoint = NULL;
 
+    anyPoint = findPoint(anyGrafo, registrador);
+    anyPoint->removido = 1;
 }
 /* Empilha o grafo na pilha(stack); */
 Lista pileGraph(grafo anyGrafo, Lista stack){
@@ -245,11 +248,45 @@ void unpileStack(grafo anyGrafo, Lista stack){
 }
 /* Encontra o vértice com um grau menor do que K */
 point* findLessK(grafo anyGrafo, int k){
+    int i;
+    point* anyPoint = NULL;
+    Node anyNode = NULL;
 
+    anyNode = getFirstNode(anyGrafo);
+    for(i=0;i<lenghtLista(anyGrafo);i++){
+        anyPoint = getThing(anyNode);
+        if(countDegree(anyGrafo, anyPoint->registrador)<k)
+            break;   
+        anyNode = getNext(anyPoint);
+    }
+    if(i<lenghtLista(anyGrafo))
+        return anyPoint;
+    else
+        return NULL;
 }
 /* Encontra algum potencial spill no grafo; */
 point* findPotencialSpill(grafo anyGrafo){
+    int i, biggerDegree = -1;
+    point* anyPoint = NULL;
+    point* resp = NULL;
+    Node anyNode = NULL;
 
+    anyNode = getFirstNode(anyGrafo);
+    for(i=0;i<lenghtLista(anyGrafo);i++){
+        anyPoint = getThing(anyNode);
+        if(countDegree(anyGrafo, anyPoint->registrador)>biggerDegree){
+            biggerDegree = countDegree(anyGrafo, anyPoint->registrador);
+            resp = anyPoint;
+        }
+        else if(countDegree(anyGrafo, anyPoint->registrador) == biggerDegree && resp != NULL){
+            if(anyPoint->registrador < resp->registrador){
+                resp = anyPoint;
+            }
+        }            
+        anyNode = getNext(anyPoint);
+    }
+
+    return resp;
 }
 /* Conta o número de vértices ativos no grafo; */
 int countVertexes(grafo anyGrafo){
