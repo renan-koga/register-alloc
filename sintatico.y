@@ -3,7 +3,8 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include <sintatico.tab.h>
-	#include "Grafo/grafo.h"
+	#include "grafo.h"
+	#include "pilha.h"
 
 	#define YYMAXDEPTH 100000000
 
@@ -14,6 +15,7 @@
   int num=0;
 
 	grafo graph;
+	Pilha stack;
 	int vertex;
 	int registers;
 	int graphNumber;
@@ -23,7 +25,7 @@
 	char *getString(FILE *_stdin);
   int yyerror(char *s);
 	void simplify();
-	void assgin();
+	int assgin();
 
 %}
 
@@ -54,41 +56,55 @@ start: END_FILE {exit(0);}
 ;
 
 program: graph color bloco	{
+															printf("GRAPH %d:", graphNumber);
 															simplify();
-															assgin();
-															printf("GRAPH %d\n", graphNumber);
+															if (assgin()) {
+																printf("SUCCESS\n");
+															}
+															else printf("SPILL\n");
+															// printf("GRAPH %d\n", lenghtLista(graph));
+															// printf("\n\n");
+															// printPoint(graph, 32);
 														}
 ;
 
 graph: GRAPH NUMBER COLON EOL { 
-	// graph =	createGraph();
-	graphNumber = $2;
-	 }
+																graph =	createGraph();
+																stack = createPilha();
+																graphNumber = $2;
+															}
 ;
 
 color: K ASSIGN NUMBER EOL { registers = $3; }
 ;
 
-bloco:
-	| NUMBER INFER NUMBER edges	{
-																vertex = $1;
-																// insertPoint(graph, vertex);
-																// insertEdge(graph, vertex, $3);
-																printf("%d <-- %d\n", $3, vertex);
-															}
-	| NUMBER MOVE NUMBER move {}
+bloco: {}
+	| fork bloco {}
+;
+
+fork:	NUMBER INFER edges 	{
+														vertex = $1;
+														insertPoint(graph, vertex);
+														// printf("<-- %d\n", vertex);
+													}
+	| NUMBER MOVE move {}
 ;
 
 edges: NUMBER edges {
-	//  insertEdge(graph, vertex, $1); 
-printf("%d ", $1);}
-	| EOL bloco
-	| bloco
+											insertEdge(graph, vertex, $1);
+											// printf("%d ", $1);
+										}
+	| NUMBER EOL 	{
+									insertEdge(graph, vertex, $1);
+									// printf("%d ", $1);
+								}
 ;
 
-move: 
+move: NUMBER move2
+;
+
+move2: NUMBER MOVE NUMBER move2
 	| EOL
-	| NUMBER MOVE NUMBER move
 ;
 
 %%
@@ -105,11 +121,32 @@ int yyerror(char *s) {
 }
 
 void simplify() {
-	
+	point *dot;
+  
+  while (countVertexes(graph) > 0) {
+    dot = findLessK(graph, registers);
+
+		printf("DOT: %d", dot->registrador);
+
+    if (dot == NULL) {
+      dot = findPotencialSpill(graph);
+    }
+    push(stack, dot);
+    removeVertex(graph, dot->registrador);
+  }
 }
 
-void assgin() {
+int assgin() {
+	point *dot;
 
+  while (lengthPilha(stack) > 0) {
+    dot = pop(stack);
+    if (!assignColor(dot, registers)) {
+      return 0;
+    }
+  }
+
+  return 1;
 }
 
 // function simplify() {

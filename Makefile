@@ -11,7 +11,7 @@ SINTATICO = sintatico.y
 $(PROGRAMA): $(LEXICO) $(SINTATICO)
 	$(FLEX) $(LEXICO)
 	$(BISON) -d $(SINTATICO) -r states
-	$(CC) -c *.c -I.
+	$(CC) -c *.c -g -I.
 	$(CC) *.o -o $(PROGRAMA)
 
 clean:
