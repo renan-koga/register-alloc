@@ -19,7 +19,7 @@ point* createPoint(int registrador){
     anyPoint->registrador = registrador;
     anyPoint->interferencias = createLista();
     anyPoint->removido = 0;
-    anyPoint->cor = -1;
+    anyPoint->cor = 0;
 
     return anyPoint;
 }
@@ -348,25 +348,35 @@ int countDegree(grafo anyGrafo, int registrador){
 /* Atribui uma cor ao registrador; retorna 1 para sucesso e 0 para erro ao atribuir; */
 int assignColor(point* anyPoint, int k){
     int* neighbourColor = (int*) malloc(k*sizeof(int));
-    int i, j=0;
+    int i, j=0, aux;
     point* anotherPoint = NULL;
+    edge* anyEdge = NULL;
     Node anyNode = NULL;
 
     for(i=0;i<k;i++)
         neighbourColor[i] = 0;
     anyNode = getFirstNode(anyPoint->interferencias);
     for(i=0;i<lenghtLista(anyPoint->interferencias);i++){
-        anotherPoint = getThing(anyNode);
+        anyEdge = getThing(anyNode);
+        if(anyEdge->reg1==anyPoint)
+            anotherPoint = anyEdge->reg2;
+        else if(anyEdge->reg2==anyPoint)
+            anotherPoint = anyEdge->reg1;        
         if(anotherPoint->removido == 0){
         		j++;
-                if(anotherPoint->cor>=0)
+                if(anotherPoint->cor>=0){
 			        neighbourColor[anotherPoint->cor] = 1;
+			    }
 		}
         anyNode = getNext(anyNode);
     }
+  //  printf("PRINTANDO VETOR DE CORES:\n");
+    //for(i=0;i<k;i++)
+		//printf("COR: %d ESTADO: %d\n", i, neighbourColor[i]);
     if(j == 0){
         anyPoint->cor = 0;
         anyPoint->removido = 0;
+//        printf("HÃM ? --- ASSIMILANDO COR %d AO REG %d\n", anyPoint->cor, anyPoint->registrador);
         return 1;
     }
     else{
@@ -374,9 +384,11 @@ int assignColor(point* anyPoint, int k){
             if(neighbourColor[i] == 0){
                 anyPoint->cor = i;
                 anyPoint->removido = 0;
+         //       printf("ASSIMILANDO COR %d AO REG %d\n", anyPoint->cor, anyPoint->registrador);
                 return 1;
             }
         }        
+       // printf("ERRO AO ASSIMILAR COR AO REG\n");
         return 0;
     }
 }

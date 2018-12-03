@@ -57,9 +57,9 @@ start: END_FILE {exit(0);}
 ;
 
 program: graph color bloco	{
-															//printf("GRAPH %d: ", graphNumber);
+															printf("GRAPH %d: ", graphNumber);
 															 //printGraph(graph);
-															 //printf("GRAPH SIZE :%d\n",lenghtLista(graph));
+															 printf("GRAPH SIZE :%d\n",lenghtLista(graph));
 															 //printf("SIMPLIFY GO GO GO\n");
 															simplify();
 															if (assgin() == 1) {
@@ -144,9 +144,9 @@ void simplify() {
 //		printf("TAM: %d\n", countVertexes(graph));
     }
     push(stack, dot);
-    //printf("TAMANHO DA PILHA: %d REG DA VEZ: %d\n", lengthPilha(stack), dot->registrador);
+    //printf("TAMANHO DA PILHA: %d DO GRAFO: %d -- REG DA VEZ: %d DREGREE: %d\n", lengthPilha(stack), lenghtLista(graph), dot->registrador,  countDegree(graph, dot->registrador));
     removeVertex(graph, dot->registrador);
-    dot->cor = -1;
+    dot->cor = 0;
   }
 }
 
@@ -155,6 +155,7 @@ int assgin() {
 
   while (lengthPilha(stack) > 0) {
     dot = (point*) pop(stack);
+	 // printf("TAMANHO DA PILHA: %d DO GRAFO: %d -- REG DA VEZ: %d DREGREE: %d\n", lengthPilha(stack)+1, countVertexes(graph), dot->registrador,  countDegree(graph, dot->registrador));
     if (assignColor(dot, registers) == 0) {
       return 0;
     }
