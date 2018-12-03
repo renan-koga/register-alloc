@@ -16,7 +16,8 @@
 
 	grafo graph;
 	Pilha stack;
-	int vertex;
+	Pilha vertexes;
+	int *vertex, *vertex2;
 	int registers;
 	int graphNumber;
 
@@ -56,8 +57,9 @@ start: END_FILE {exit(0);}
 ;
 
 program: graph color bloco	{
-															printf("GRAPH %d:", graphNumber);
-															printf("GRAPH SIZE :%d\n",lenghtLista(graph));
+															printf("GRAPH %d: ", graphNumber);
+															// printGraph(graph);
+															// printf("GRAPH SIZE :%d\n",lenghtLista(graph));
 															simplify();
 															if (assgin()) {
 																printf("SUCCESS\n");
@@ -71,6 +73,7 @@ program: graph color bloco	{
 graph: GRAPH NUMBER COLON EOL { 
 																graph =	createGraph();
 																stack = createPilha();
+																vertexes = createPilha();
 																graphNumber = $2;
 															}
 ;
@@ -83,19 +86,28 @@ bloco: {}
 ;
 
 fork:	NUMBER INFER edges 	{
-														vertex = $1;
-														insertPoint(graph, vertex);
+														push(vertexes, &$1);
+														// vertex = $1;
 														// printf("<-- %d\n", vertex);
+														vertex = (int *) pop(vertexes);
+														insertPoint(graph, *vertex);
+														
+														while (lengthPilha(vertexes) > 0) {
+															vertex2 = (int *) pop(vertexes);
+															insertEdge(graph, *vertex, *vertex2);					
+														}
 													}
 	| NUMBER MOVE move {}
 ;
 
 edges: NUMBER edges {
-											insertEdge(graph, vertex, $1);
+											push(vertexes, &$1);
+											// insertEdge(graph, vertex, $1);
 											// printf("%d ", $1);
 										}
 	| NUMBER EOL 	{
-									insertEdge(graph, vertex, $1);
+									push(vertexes, &$1);
+									// insertEdge(graph, vertex, $1);
 									// printf("%d ", $1);
 								}
 ;
@@ -124,9 +136,12 @@ void simplify() {
 	point *dot = NULL;
 
   while (countVertexes(graph) > 0) {
+
     dot = findLessK(graph, registers);
     if (dot == NULL) {
       dot = findPotencialSpill(graph);
+
+			printf("TAM: %d\n", countVertexes(graph));
     }
     push(stack, dot);
     removeVertex(graph, dot->registrador);

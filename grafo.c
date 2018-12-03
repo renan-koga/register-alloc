@@ -168,6 +168,19 @@ void printPoint(grafo anyGrafo, int registrador){
         printf("-AUSÊNCIA DO REGISTRADOR-\n");
     }
 }
+void printGraph(grafo anyGrafo){
+    int i;
+    Node anyNode = NULL;
+    point* anyPoint = NULL;
+
+    anyNode = getFirstNode(anyGrafo);
+    for (i=0; i<lenghtLista(anyGrafo); i++) {
+        anyPoint = getThing(anyNode);
+        printPoint(anyGrafo, anyPoint->registrador);
+
+        anyNode = getNext(anyNode);
+    }
+}
 /*Encontra o registrador no grafo (retorna 1 para*/
 Node findPoint(grafo anyGrafo, int registrador){
     int i;

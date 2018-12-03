@@ -58,4 +58,6 @@
 	/* Atribui uma cor ao registrador; retorna 1 para sucesso e 0 para erro ao atribuir; */
 	int assignColor(point* anyPoint, int k);
 
+
+	void printGraph(grafo anyGrafo);
 #endif
