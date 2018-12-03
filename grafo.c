@@ -27,8 +27,12 @@ point* createPoint(int registrador){
 point* insertPoint(grafo anyGrafo, int registrador){
     point* anyPoint = NULL;
 
-    anyPoint = createPoint(registrador);
-    addNode(anyGrafo, anyPoint);
+	if(findPoint(anyGrafo, registrador)==NULL){
+	    anyPoint = createPoint(registrador);
+	    addNode(anyGrafo, anyPoint);
+	}
+	else
+		anyPoint = getThing(findPoint(anyGrafo, registrador));
 
     return anyPoint;
 }
@@ -235,7 +239,7 @@ void destroiEdges(int registrador){
 void removeVertex(grafo anyGrafo, int registrador){
     point* anyPoint = NULL;
 
-    anyPoint = findPoint(anyGrafo, registrador);
+    anyPoint = getThing(findPoint(anyGrafo, registrador));
     anyPoint->removido = 1;
 }
 /* Empilha o grafo na pilha(stack); */
@@ -255,9 +259,9 @@ point* findLessK(grafo anyGrafo, int k){
     anyNode = getFirstNode(anyGrafo);
     for(i=0;i<lenghtLista(anyGrafo);i++){
         anyPoint = getThing(anyNode);
-        if(countDegree(anyGrafo, anyPoint->registrador)<k)
+        if(countDegree(anyGrafo, anyPoint->registrador)<k && anyPoint->removido==0)
             break;   
-        anyNode = getNext(anyPoint);
+        anyNode = getNext(anyNode);
     }
     if(i<lenghtLista(anyGrafo))
         return anyPoint;
@@ -283,7 +287,7 @@ point* findPotencialSpill(grafo anyGrafo){
                 resp = anyPoint;
             }
         }            
-        anyNode = getNext(anyPoint);
+        anyNode = getNext(anyNode);
     }
 
     return resp;
@@ -339,6 +343,7 @@ int assignColor(point* anyPoint, int k){
         neighbourColor[i] = 0;
     anyNode = getFirstNode(anyPoint->interferencias);
     for(i=0;i<lenghtLista(anyPoint->interferencias);i++){
+    ////////// TRATAR ISSO AQUI
         anotherPoint = getThing(anyNode);
         neighbourColor[anotherPoint->cor] = 1;
         anyNode = getNext(anyNode);

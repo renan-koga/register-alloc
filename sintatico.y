@@ -57,12 +57,12 @@ start: END_FILE {exit(0);}
 
 program: graph color bloco	{
 															printf("GRAPH %d:", graphNumber);
+															printf("GRAPH SIZE :%d\n",lenghtLista(graph));
 															simplify();
 															if (assgin()) {
 																printf("SUCCESS\n");
 															}
 															else printf("SPILL\n");
-															// printf("GRAPH %d\n", lenghtLista(graph));
 															// printf("\n\n");
 															// printPoint(graph, 32);
 														}
@@ -121,18 +121,16 @@ int yyerror(char *s) {
 }
 
 void simplify() {
-	point *dot;
-  
+	point *dot = NULL;
+
   while (countVertexes(graph) > 0) {
     dot = findLessK(graph, registers);
-
-		printf("DOT: %d", dot->registrador);
-
     if (dot == NULL) {
       dot = findPotencialSpill(graph);
     }
     push(stack, dot);
     removeVertex(graph, dot->registrador);
+    
   }
 }
 
