@@ -57,11 +57,12 @@ start: END_FILE {exit(0);}
 ;
 
 program: graph color bloco	{
-															printf("GRAPH %d: ", graphNumber);
-															// printGraph(graph);
-															// printf("GRAPH SIZE :%d\n",lenghtLista(graph));
+															//printf("GRAPH %d: ", graphNumber);
+															 //printGraph(graph);
+															 //printf("GRAPH SIZE :%d\n",lenghtLista(graph));
+															 //printf("SIMPLIFY GO GO GO\n");
 															simplify();
-															if (assgin()) {
+															if (assgin() == 1) {
 																printf("SUCCESS\n");
 															}
 															else printf("SPILL\n");
@@ -136,16 +137,16 @@ void simplify() {
 	point *dot = NULL;
 
   while (countVertexes(graph) > 0) {
-
+	dot = NULL;
     dot = findLessK(graph, registers);
     if (dot == NULL) {
       dot = findPotencialSpill(graph);
-
-			printf("TAM: %d\n", countVertexes(graph));
+//		printf("TAM: %d\n", countVertexes(graph));
     }
     push(stack, dot);
+    //printf("TAMANHO DA PILHA: %d REG DA VEZ: %d\n", lengthPilha(stack), dot->registrador);
     removeVertex(graph, dot->registrador);
-    
+    dot->cor = -1;
   }
 }
 
@@ -153,8 +154,8 @@ int assgin() {
 	point *dot;
 
   while (lengthPilha(stack) > 0) {
-    dot = pop(stack);
-    if (!assignColor(dot, registers)) {
+    dot = (point*) pop(stack);
+    if (assignColor(dot, registers) == 0) {
       return 0;
     }
   }

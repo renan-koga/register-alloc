@@ -291,11 +291,11 @@ point* findPotencialSpill(grafo anyGrafo){
     anyNode = getFirstNode(anyGrafo);
     for(i=0;i<lenghtLista(anyGrafo);i++){
         anyPoint = getThing(anyNode);
-        if(countDegree(anyGrafo, anyPoint->registrador)>biggerDegree){
+        if(countDegree(anyGrafo, anyPoint->registrador)>biggerDegree && anyPoint->removido == 0){
             biggerDegree = countDegree(anyGrafo, anyPoint->registrador);
             resp = anyPoint;
         }
-        else if(countDegree(anyGrafo, anyPoint->registrador) == biggerDegree && resp != NULL){
+        else if(countDegree(anyGrafo, anyPoint->registrador) == biggerDegree && resp != NULL && anyPoint->removido == 0){
             if(anyPoint->registrador < resp->registrador){
                 resp = anyPoint;
             }
@@ -348,7 +348,7 @@ int countDegree(grafo anyGrafo, int registrador){
 /* Atribui uma cor ao registrador; retorna 1 para sucesso e 0 para erro ao atribuir; */
 int assignColor(point* anyPoint, int k){
     int* neighbourColor = (int*) malloc(k*sizeof(int));
-    int i;
+    int i, j=0;
     point* anotherPoint = NULL;
     Node anyNode = NULL;
 
@@ -356,19 +356,24 @@ int assignColor(point* anyPoint, int k){
         neighbourColor[i] = 0;
     anyNode = getFirstNode(anyPoint->interferencias);
     for(i=0;i<lenghtLista(anyPoint->interferencias);i++){
-    ////////// TRATAR ISSO AQUI
         anotherPoint = getThing(anyNode);
-        neighbourColor[anotherPoint->cor] = 1;
+        if(anotherPoint->removido == 0){
+        		j++;
+                if(anotherPoint->cor>=0)
+			        neighbourColor[anotherPoint->cor] = 1;
+		}
         anyNode = getNext(anyNode);
     }
-    if(i == 0){
+    if(j == 0){
         anyPoint->cor = 0;
+        anyPoint->removido = 0;
         return 1;
     }
     else{
         for(i=0;i<k;i++){
             if(neighbourColor[i] == 0){
                 anyPoint->cor = i;
+                anyPoint->removido = 0;
                 return 1;
             }
         }        
