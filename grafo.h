@@ -8,6 +8,7 @@
     typedef struct _point{
         int registrador;
         int cor;
+		int grau;
         int removido;
         Lista interferencias;
     }point;
@@ -57,7 +58,6 @@
 	int countDegree(grafo anyGrafo, int registrador);
 	/* Atribui uma cor ao registrador; retorna 1 para sucesso e 0 para erro ao atribuir; */
 	int assignColor(point* anyPoint, int k);
-
 
 	void printGraph(grafo anyGrafo);
 #endif

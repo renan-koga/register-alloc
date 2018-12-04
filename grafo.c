@@ -305,13 +305,17 @@ point* findLessK(grafo anyGrafo, int k){
     point* anyPoint = NULL;
     Node anyNode = NULL;
 
+    // printf("\n\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n");
+
     sizeList = lenghtLista(anyGrafo);
-    anyNode = getFirstNode(anyGrafo);
+    anyNode = getLastNode(anyGrafo);
     for(i=0;i<sizeList;i++){
         anyPoint = getThing(anyNode);
-        if(countDegree(anyGrafo, anyPoint->registrador)<k && anyPoint->removido==0)
-            break;   
-        anyNode = getNext(anyNode);
+        // printf(">>>>>>>>>>>>>>> %d ----- %d\n\n", anyPoint->registrador, i);
+        if (anyPoint->removido == 0)
+            if(countDegree(anyGrafo, anyPoint->registrador)<k)
+                break;   
+        anyNode = getPrevious(anyNode);
     }
     if(i<sizeList)
         return anyPoint;
@@ -329,16 +333,19 @@ point* findPotencialSpill(grafo anyGrafo){
     anyNode = getFirstNode(anyGrafo);
     for(i=0;i<sizeList;i++){
         anyPoint = getThing(anyNode);
-        count = countDegree(anyGrafo, anyPoint->registrador);
-        if(count > biggerDegree && anyPoint->removido == 0){
-            biggerDegree = count;
-            resp = anyPoint;
-        }
-        else if(count == biggerDegree && resp != NULL && anyPoint->removido == 0){
-            if(anyPoint->registrador < resp->registrador){
+        if (anyPoint->removido == 0) {
+            count = countDegree(anyGrafo, anyPoint->registrador);
+
+            if(count > biggerDegree){
+                biggerDegree = count;
                 resp = anyPoint;
             }
-        }            
+            else if(count == biggerDegree && resp != NULL){
+                if(anyPoint->registrador < resp->registrador){
+                    resp = anyPoint;
+                }
+            }            
+        }
         anyNode = getNext(anyNode);
     }
 

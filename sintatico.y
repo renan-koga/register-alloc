@@ -20,6 +20,7 @@
 	int *vertex, *vertex2;
 	int registers;
 	int graphNumber;
+	int teste;
 
 	void printLine(int line);
 	void printErroPointer(int column);
@@ -58,14 +59,22 @@ start: END_FILE {exit(0);}
 
 program: graph color bloco	{
 															printf("Graph %d: ", graphNumber);
-															 printGraph(graph);
-															//  printf("GRAPH SIZE :%d\n",lenghtLista(graph));
-															simplify();
-															 printf("SIMPLIFY GO GO GO\n");
-															if (assign() == 1) {
+															  // printGraph(graph);
+																// printf("\n\n\n\n\n\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+															  // printf("GRAPH SIZE :%d\n",lenghtLista(graph));
+																// 	printf("\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+																// printf(">>>>>>>>>>>> %d\n", countVertexes(graph));
+															if (lenghtLista(graph) == 0) {
 																printf("SUCCESS\n");
 															}
-															else printf("SPILL\n");
+															else {
+																simplify();
+																//  printf("SIMPLIFY GO GO GO\n");
+																if (assign() == 1) {
+																	printf("SUCCESS\n");
+																}
+																else printf("SPILL\n");
+															}
 															// clearPilha(stack);
 															// clearPilha(vertexes);
 															// printf("\n\n");
@@ -78,6 +87,7 @@ graph: GRAPH NUMBER COLON EOL {
 																stack = createPilha();
 																vertexes = createPilha();
 																graphNumber = $2;
+																
 															}
 ;
 
@@ -137,20 +147,24 @@ int yyerror(char *s) {
 
 void simplify() {
 	point *dot = NULL;
-	int count = countVertexes(graph);
+
+	int count = lenghtLista(graph);
+
+	// printf("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+	// int count = 3555;
 
   while (count > 0) {
 		dot = NULL;
     dot = findLessK(graph, registers);
     if (dot == NULL) {
       dot = findPotencialSpill(graph);
-//		printf("TAM: %d\n", countVertexes(graph));
+		// printf("TAM: %d\n", countVertexes(graph));
     }
 		dot->removido = 1;
-    push(stack, dot);
 		count--;
-    // printf("TAMANHO DA PILHA: %d DO GRAFO: %d -- REG DA VEZ: %d DREGREE: %d\n", lengthPilha(stack), lenghtLista(graph), dot->registrador,  countDegree(graph, dot->registrador));
-    // removeVertex(graph, dot->registrador);
+    push(stack, dot);
+    // removeVertex(graph, dot);
+    //  printf("TAMANHO DA PILHA: %d DO GRAFO: %d -- REG DA VEZ: %d DREGREE: %d\n", lengthPilha(stack), lenghtLista(graph), dot->registrador,  countDegree(graph, dot->registrador));
     // dot->cor = 0;
   }
 }
@@ -168,33 +182,3 @@ int assign() {
 
   return 1;
 }
-
-// function simplify() {
-//   stack *st;
-//   point *dot;
-  
-//   while (graph.length > 0) {
-//     dot = findLessK(graph, registers);
-
-//     if (dot == NULL) {
-//       dot = potencialSpill(graph);
-//     }
-//     push(st, dot);
-//     removePoint(graph, dot);
-//   }
-
-//   return st;
-// }
-
-// function assign(stack) {
-//   point *dot;
-
-//   while (stack.length > 0) {
-//     dot = pop(stack);
-//     if (!assignColor(graph, dot)) {
-//       return 0;
-//     }
-//   }
-
-//   return 1;
-// }
