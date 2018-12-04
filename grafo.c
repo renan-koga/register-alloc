@@ -12,23 +12,27 @@ grafo createGraph(){
     return anyGrafo;
 }
 /*Gera uma instância do tipo Point, com um id e sua cor*/
-point* createPoint(int registrador){
+point* createPoint(int registrador, int k){
     point* anyPoint = NULL;
 
     anyPoint = (point*) malloc(sizeof(point));
     anyPoint->registrador = registrador;
     anyPoint->interferencias = createLista();
     anyPoint->removido = 0;
-    anyPoint->cor = 0;
+
+    if (registrador < k) {
+        anyPoint->cor = registrador;
+    }
+    else anyPoint->cor = -1;
 
     return anyPoint;
 }
 /*Insere um registrador no grafo*/
-point* insertPoint(grafo anyGrafo, int registrador){
+point* insertPoint(grafo anyGrafo, int registrador, int k){
     point* anyPoint = NULL;
 
 	if(findPoint(anyGrafo, registrador)==NULL){
-	    anyPoint = createPoint(registrador);
+	    anyPoint = createPoint(registrador, k);
 	    addNode(anyGrafo, anyPoint);
 	}
 	else
@@ -45,26 +49,57 @@ void createEdge(point* reg1, point* reg2){
     addNode(reg1->interferencias, anyEdge);
     addNode(reg2->interferencias, anyEdge);
 }
+int existEdge(point *reg1, point *reg2) {
+    Node anyNode;
+    edge *anyEdge;
+
+    anyNode = getFirstNode(reg1->interferencias);
+    while (anyNode != NULL) {
+        anyEdge = getThing(anyNode);
+
+        if (anyEdge->reg1 == reg1) {
+            if (anyEdge->reg2 == reg2) {
+                return 1;
+            }
+        }
+        else if (anyEdge->reg2 == reg1) {
+            if (anyEdge->reg1 == reg2) {
+                return 1;
+            }
+        }
+
+        anyNode = getNext(anyNode);
+    }
+
+    return 0;
+}
 /*Insere uma aresta entre Point 'reg1' e Point 'reg2'*/
-void insertEdge(grafo anyGrafo, int reg1, int reg2){
+void insertEdge(grafo anyGrafo, int reg1, int reg2, int k){
     point* anyPoint = NULL;
     point* anotherPoint = NULL;
+    Node anyNode1 = NULL;
+    Node anyNode2 = NULL;
 
-    if(findPoint(anyGrafo, reg1)!=NULL)
-        anyPoint = getThing(findPoint(anyGrafo, reg1));
-    if(findPoint(anyGrafo, reg2)!=NULL)
-        anotherPoint = getThing(findPoint(anyGrafo, reg2));
+    anyNode1 = findPoint(anyGrafo, reg1);
+    anyNode2 = findPoint(anyGrafo, reg2);
+
+    if(anyNode1 != NULL)
+        anyPoint = getThing(anyNode1);
+    if(anyNode2 != NULL)
+        anotherPoint = getThing(anyNode2);
     if(anyPoint==NULL && anotherPoint==NULL){
-        anyPoint = insertPoint(anyGrafo, reg1);
-        anotherPoint = insertPoint(anyGrafo, reg2);
+        anyPoint = insertPoint(anyGrafo, reg1, k);
+        anotherPoint = insertPoint(anyGrafo, reg2, k);
     }
     else if(anyPoint==NULL){
-        anyPoint = insertPoint(anyGrafo, reg1);
+        anyPoint = insertPoint(anyGrafo, reg1, k);
     }
     else if(anotherPoint==NULL){
-        anotherPoint = insertPoint(anyGrafo, reg2);
+        anotherPoint = insertPoint(anyGrafo, reg2, k);
     }
-    createEdge(anyPoint, anotherPoint);
+    if (!existEdge(anyPoint, anotherPoint)) {
+        createEdge(anyPoint, anotherPoint);
+    }
 }
 /*Remove a aresta entre Point 'reg1' e Point 'reg2'*/
 void removeEdge(grafo anyGrafo, int reg1, int reg2){
@@ -183,12 +218,13 @@ void printGraph(grafo anyGrafo){
 }
 /*Encontra o registrador no grafo (retorna 1 para*/
 Node findPoint(grafo anyGrafo, int registrador){
-    int i;
+    int i, sizeList;
     point* anyPoint = NULL;
     Node anyNode = NULL;
 
+    sizeList = lenghtLista(anyGrafo);
     anyNode = getFirstNode(anyGrafo);
-    for(i=1;i<=lenghtLista(anyGrafo);i++){
+    for(i=1;i<=sizeList;i++){
         if(anyNode==NULL)
             break;
         anyPoint = getThing(anyNode);
@@ -196,7 +232,7 @@ Node findPoint(grafo anyGrafo, int registrador){
             break;
         anyNode = getNext(anyNode);
     }
-    if(i<=lenghtLista(anyGrafo))
+    if(i <= sizeList)
         return anyNode;
     else
         return NULL;
@@ -265,37 +301,40 @@ void unpileStack(grafo anyGrafo, Lista stack){
 }
 /* Encontra o vértice com um grau menor do que K */
 point* findLessK(grafo anyGrafo, int k){
-    int i;
+    int i, sizeList;
     point* anyPoint = NULL;
     Node anyNode = NULL;
 
+    sizeList = lenghtLista(anyGrafo);
     anyNode = getFirstNode(anyGrafo);
-    for(i=0;i<lenghtLista(anyGrafo);i++){
+    for(i=0;i<sizeList;i++){
         anyPoint = getThing(anyNode);
         if(countDegree(anyGrafo, anyPoint->registrador)<k && anyPoint->removido==0)
             break;   
         anyNode = getNext(anyNode);
     }
-    if(i<lenghtLista(anyGrafo))
+    if(i<sizeList)
         return anyPoint;
     else
         return NULL;
 }
 /* Encontra algum potencial spill no grafo; */
 point* findPotencialSpill(grafo anyGrafo){
-    int i, biggerDegree = -1;
+    int i, count, sizeList, biggerDegree = -1;
     point* anyPoint = NULL;
     point* resp = NULL;
     Node anyNode = NULL;
 
+    sizeList = lenghtLista(anyGrafo);
     anyNode = getFirstNode(anyGrafo);
-    for(i=0;i<lenghtLista(anyGrafo);i++){
+    for(i=0;i<sizeList;i++){
         anyPoint = getThing(anyNode);
-        if(countDegree(anyGrafo, anyPoint->registrador)>biggerDegree && anyPoint->removido == 0){
-            biggerDegree = countDegree(anyGrafo, anyPoint->registrador);
+        count = countDegree(anyGrafo, anyPoint->registrador);
+        if(count > biggerDegree && anyPoint->removido == 0){
+            biggerDegree = count;
             resp = anyPoint;
         }
-        else if(countDegree(anyGrafo, anyPoint->registrador) == biggerDegree && resp != NULL && anyPoint->removido == 0){
+        else if(count == biggerDegree && resp != NULL && anyPoint->removido == 0){
             if(anyPoint->registrador < resp->registrador){
                 resp = anyPoint;
             }
@@ -307,12 +346,13 @@ point* findPotencialSpill(grafo anyGrafo){
 }
 /* Conta o número de vértices ativos no grafo; */
 int countVertexes(grafo anyGrafo){
-    int i, resp=0;
+    int i, sizeList, resp=0;
     point* anyPoint = NULL;
     Node anyNode = NULL;
 
+    sizeList = lenghtLista(anyGrafo);
     anyNode = getFirstNode(anyGrafo);
-    for(i=0;i<lenghtLista(anyGrafo);i++){
+    for(i=0;i<sizeList;i++){
         anyPoint = getThing(anyNode);
         // printf("Registrador -----> %d", anyPoint->registrador);
         if(anyPoint->removido == 0)
@@ -324,20 +364,20 @@ int countVertexes(grafo anyGrafo){
 }
 /* Conta o grau do registrador; */
 int countDegree(grafo anyGrafo, int registrador){
-    int i, resp=0;
+    int i, sizeList, resp=0;
     point* anyPoint = NULL;
     point* otherPoint = NULL;
     edge* anyEdge = NULL;
     Node anyNode = NULL;
 
     anyPoint = getThing(findPoint(anyGrafo, registrador));
+    sizeList = lenghtLista(anyPoint->interferencias);
     anyNode = getFirstNode(anyPoint->interferencias);
-    for(i=0;i<lenghtLista(anyPoint->interferencias);i++){
+    for(i=0;i<sizeList;i++){
         anyEdge = getThing(anyNode);
         if(anyEdge->reg1 == anyPoint)
             otherPoint = anyEdge->reg2;
-        else
-            otherPoint = anyEdge->reg1;
+        else otherPoint = anyEdge->reg1;
         if(otherPoint->removido == 0)
             resp++;
         anyNode = getNext(anyNode);
@@ -373,13 +413,13 @@ int assignColor(point* anyPoint, int k){
   //  printf("PRINTANDO VETOR DE CORES:\n");
     //for(i=0;i<k;i++)
 		//printf("COR: %d ESTADO: %d\n", i, neighbourColor[i]);
-    if(j == 0){
-        anyPoint->cor = 0;
-        anyPoint->removido = 0;
-//        printf("HÃM ? --- ASSIMILANDO COR %d AO REG %d\n", anyPoint->cor, anyPoint->registrador);
-        return 1;
-    }
-    else{
+//     if(j == 0){
+//         anyPoint->cor = 0;
+//         anyPoint->removido = 0;
+// //        printf("HÃM ? --- ASSIMILANDO COR %d AO REG %d\n", anyPoint->cor, anyPoint->registrador);
+//         return 1;
+//     }
+    // else{
         for(i=0;i<k;i++){
             if(neighbourColor[i] == 0){
                 anyPoint->cor = i;
@@ -390,5 +430,5 @@ int assignColor(point* anyPoint, int k){
         }        
        // printf("ERRO AO ASSIMILAR COR AO REG\n");
         return 0;
-    }
+    // }
 }

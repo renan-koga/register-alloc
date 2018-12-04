@@ -20,12 +20,12 @@
 
 	grafo createGraph();
 	/*Gera uma instância do tipo Point, com um id e sua cor*/
-	point* createPoint(int registrador);
+	point* createPoint(int registrador, int k);
 	/*Insere um registrador no grafo*/
-	point* insertPoint(grafo anyGrafo, int registrador);
+	point* insertPoint(grafo anyGrafo, int registrador, int k);
 	void createEdge(point* reg1, point* reg2);
 	/*Insere uma aresta entre Point 'reg1' e Point 'reg2'*/
-	void insertEdge(grafo anyGrafo, int reg1, int reg2);
+	void insertEdge(grafo anyGrafo, int reg1, int reg2, int k);
 	/*Remove a aresta entre Point 'reg1' e Point 'reg2'*/
 	void removeEdge(grafo anyGrafo, int reg1, int reg2);
 	/*Remove o registrador*/

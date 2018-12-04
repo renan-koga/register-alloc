@@ -26,7 +26,7 @@
 	char *getString(FILE *_stdin);
   int yyerror(char *s);
 	void simplify();
-	int assgin();
+	int assign();
 
 %}
 
@@ -57,15 +57,17 @@ start: END_FILE {exit(0);}
 ;
 
 program: graph color bloco	{
-															printf("GRAPH %d: ", graphNumber);
-															 //printGraph(graph);
-															 printf("GRAPH SIZE :%d\n",lenghtLista(graph));
-															 //printf("SIMPLIFY GO GO GO\n");
+															printf("Graph %d: ", graphNumber);
+															 printGraph(graph);
+															//  printf("GRAPH SIZE :%d\n",lenghtLista(graph));
 															simplify();
-															if (assgin() == 1) {
+															 printf("SIMPLIFY GO GO GO\n");
+															if (assign() == 1) {
 																printf("SUCCESS\n");
 															}
 															else printf("SPILL\n");
+															// clearPilha(stack);
+															// clearPilha(vertexes);
 															// printf("\n\n");
 															// printPoint(graph, 32);
 														}
@@ -91,11 +93,11 @@ fork:	NUMBER INFER edges 	{
 														// vertex = $1;
 														// printf("<-- %d\n", vertex);
 														vertex = (int *) pop(vertexes);
-														insertPoint(graph, *vertex);
+														insertPoint(graph, *vertex, registers);
 														
 														while (lengthPilha(vertexes) > 0) {
 															vertex2 = (int *) pop(vertexes);
-															insertEdge(graph, *vertex, *vertex2);					
+															insertEdge(graph, *vertex, *vertex2, registers);					
 														}
 													}
 	| NUMBER MOVE move {}
@@ -135,22 +137,25 @@ int yyerror(char *s) {
 
 void simplify() {
 	point *dot = NULL;
+	int count = countVertexes(graph);
 
-  while (countVertexes(graph) > 0) {
-	dot = NULL;
+  while (count > 0) {
+		dot = NULL;
     dot = findLessK(graph, registers);
     if (dot == NULL) {
       dot = findPotencialSpill(graph);
 //		printf("TAM: %d\n", countVertexes(graph));
     }
+		dot->removido = 1;
     push(stack, dot);
-    //printf("TAMANHO DA PILHA: %d DO GRAFO: %d -- REG DA VEZ: %d DREGREE: %d\n", lengthPilha(stack), lenghtLista(graph), dot->registrador,  countDegree(graph, dot->registrador));
-    removeVertex(graph, dot->registrador);
-    dot->cor = 0;
+		count--;
+    // printf("TAMANHO DA PILHA: %d DO GRAFO: %d -- REG DA VEZ: %d DREGREE: %d\n", lengthPilha(stack), lenghtLista(graph), dot->registrador,  countDegree(graph, dot->registrador));
+    // removeVertex(graph, dot->registrador);
+    // dot->cor = 0;
   }
 }
 
-int assgin() {
+int assign() {
 	point *dot;
 
   while (lengthPilha(stack) > 0) {
